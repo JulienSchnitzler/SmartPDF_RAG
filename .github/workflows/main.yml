@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Nécessaire pour le push vers HF plus tard
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
@@ -22,9 +24,9 @@ jobs:
       - name: Set up Python
         run: uv python install 3.11
 
-      - name: Install Dev Dependencies
+      - name: Install Dependencies
         # On installe uniquement le groupe dev pour gagner du temps
-        run: uv pip install --system . --group dev
+        run: uv sync --group dev
 
       - name: Check Formatting (Black)
         # Échoue si le code n'est pas strictement formaté selon pyproject.toml
@@ -35,10 +37,11 @@ jobs:
         run: uv run ruff check .
 
       - name: Push to HF
-        # CETTE LIGNE EST LA CLÉ : Elle vérifie si le secret existe
-        if: env.HF_TOKEN != '' 
+        # S'exécute uniquement si le secret HF_TOKEN est configuré dans GitHub
+        if: github.event_name == 'push' && success()
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote add hf https://user_name:$HF_TOKEN@huggingface.co/spaces/user_name/space_name
-          git push --force hf main
+          # Remplace 'ton-username' et 'ton-space-name' par tes vraies infos
+          git remote add hf https://JulienSchnitzler:$HF_TOKEN@huggingface.co/spaces/JulienSchnitzler/SmartPDF_RAG
+          git push --force hf HEAD:main
