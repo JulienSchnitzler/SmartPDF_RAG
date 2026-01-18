@@ -24,7 +24,7 @@ jobs:
 
       - name: Install Dev Dependencies
         # On installe uniquement le groupe dev pour gagner du temps
-        run: uv pip install . --group dev
+        run: uv pip install --system . --group dev
 
       - name: Check Formatting (Black)
         # Échoue si le code n'est pas strictement formaté selon pyproject.toml
