@@ -8,48 +8,65 @@ app_file: chatbot_app.py
 pinned: false
 ---
 
-# 📄 SmartPDF-RAG : Chatbot Intelligent avec Gemini 3
+# 📄 SmartPDF-RAG : Assistant Intelligent avec Gemini 3 & BM25
 
-Une application de **RAG (Retrieval-Augmented Generation)** moderne et rapide permettant de discuter avec vos documents PDF en utilisant la puissance de **Google Gemini 3**.
+Ce projet est une application de RAG (Retrieval-Augmented Generation) permettant d'interroger des documents PDF de manière naturelle. Il utilise la puissance de Google Gemini 3 combinée à un moteur de recherche BM25 pour garantir des réponses précises et sourcées.
 
 ## ✨ Points Forts
 
 - **LLM de Pointe** : Propulsé par `gemini-3-flash-preview` pour des réponses instantanées et précises.
+- **Recherche de Texte (BM25)** : Utilisation de l'algorithme de classement BM25Okapi pour retrouver les passages les plus pertinents basés sur les termes exacts.
 - **Gestionnaire Moderne** : Utilise `uv` pour une installation 10x plus rapide et une gestion des dépendances fiable.
-- **Indexation Intelligente** : Stockage vectoriel avec **FAISS** permettant la persistance locale des données (évite de re-scanner les PDF à chaque lancement).
 - **Interface Intuitive** : Développé avec **Streamlit** pour une expérience de chat fluide.
 - **Transparence** : Affichage automatique des sources (extraits de PDF) utilisées pour générer chaque réponse.
+- **Conteneurisation Complète** : Déploiement simplifié via Docker et Docker Compose, incluant un service de linting automatique.
 
 ## 🛠️ Stack Technique
 
-- **Langage** : Python 3.9+
 - **Orchestration** : LangChain
-- **IA (LLM & Embeddings)** : Google Generative AI (Gemini 3)
-- **Base de Données Vectorielle** : FAISS
-- **Gestion de projet** : `uv` & `pyproject.toml`
+- **IA (LLM)** : Google Generative AI (Gemini 3)
+- **Indexation** : BM25 (via rank-bm25)
+- **Gestionnaire de paquets** : uv (Astral) pour des builds ultra-rapides
 - **Interface** : Streamlit
+- **Qualité du code** : Ruff & Black (via Docker lint)
+- **Monitoring** : Langfuse (optionnel)
 
-## 🚀 Installation Rapide
+## 🚀 Installation et Lancement
 
 Ce projet utilise [uv](https://github.com/astral-sh/uv) pour une gestion simplifiée.
 
-### 1. Cloner le projet
+1. Prérequis
+Créez un fichier .env à la racine du projet :
 ```bash
-git clone [https://github.com/JulienSchnitzler/SmartPDF_RAG.git](https://github.com/JulienSchnitzler/SmartPDF_RAG.git)
-cd SmartPDF_RAG
-```
-
-### 2. Initialiser l'environnement
-```bash
-# Crée le venv et installe toutes les dépendances verrouillées
-uv sync
-```
-
-### 3. Configurer les secrets
-Créez un fichier .env à la racine :
-```Plaintext
 GOOGLE_API_KEY="VOTRE_CLE_API_GOOGLE"
+
+# Optionnel (Monitoring)
+LANGFUSE_PUBLIC_KEY=
+LANGFUSE_SECRET_KEY=
+LANGFUSE_HOST="https://cloud.langfuse.com"
 ```
+
+### 2. Lancement avec Docker (Recommandé)
+```bash
+docker-compose up --build
+```
+L'application sera disponible sur http://localhost:8501.
+
+### 3. Installation Locale avec uv
+Si vous préférez lancer le projet nativement :
+```bash
+uv sync
+uv run streamlit run chatbot_app.py
+```
+
+## 🌍 Déploiement sur Hugging Face Spaces
+
+Ce projet est compatible avec Hugging Face Spaces (SDK Docker).
+
+1. SDK : Streamlit
+2. Port : L'application utilise par défaut le port 8501, mais peut être configurée sur 7860 pour HF dans le Dockerfile.
+3. Secrets : Ajoutez votre GOOGLE_API_KEY dans les Settings > Variables and secrets de votre Space Hugging Face.
+
 ## 📂 Utilisation
 
 1. Placez vos fichiers PDF dans le dossier PDF/.
@@ -62,13 +79,21 @@ uv run streamlit run chatbot_app.py
 ## 📁 Structure du projet
 ```Plaintext
 .
-├── PDF/                 # Vos documents PDF source
-├── faiss_index/         # Index vectoriel généré localement (ignoré par Git)
-├── chatbot_app.py       # Interface utilisateur Streamlit
-├── rag_pipeline.py      # Cœur du pipeline RAG
-├── pyproject.toml       # Configuration et dépendances modernes
-└── uv.lock              # Fichier de verrouillage des versions
+├── PDF/                 # Dossier source des documents PDF
+├── bm25_index/          # Stockage local de l'index BM25 (manifeste + store)
+├── chatbot_app.py       # Interface Streamlit et logique de conversation
+├── rag_pipeline.py      # Cœur du pipeline (BM25, Tokenization, LLM)
+├── Dockerfile           # Configuration de l'image Docker
+├── docker-compose.yml   # Orchestration des services app et lint
+└── pyproject.toml       # Dépendances et configuration des outils (Ruff, Black)
 ```
+
+## 💡 Fonctionnement de l'Indexation
+
+L'application surveille automatiquement le dossier PDF/. Un "fingerprint" (empreinte numérique) est calculé à chaque lancement :
+
+- Si de nouveaux fichiers sont ajoutés ou modifiés, l'index BM25 est reconstruit.
+- Sinon, l'index est chargé depuis le disque pour un démarrage instantané.
 
 ## Développements futurs
 à venir ...

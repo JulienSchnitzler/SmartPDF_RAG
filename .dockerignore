@@ -11,7 +11,11 @@ venv/
 
 # Index et documents (souvent volumineux)
 faiss_index/
+bm25_index/
 PDF/
+
+# env
+.env
 
 # Git
 .git/

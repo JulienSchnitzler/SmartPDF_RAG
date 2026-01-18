@@ -1,26 +1,23 @@
 FROM python:3.11-slim
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Dépendances système utiles (faiss / numpy)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Installer les dépendances
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Installation directe depuis pyproject.toml
+COPY pyproject.toml .
+RUN uv pip install --system --no-cache .
 
-# Copier le code
+# Copie du reste du projet [cite: 3]
 COPY . .
 
-# Streamlit
-EXPOSE 8501
+EXPOSE 7860
 
-# Evite les warnings + écoute sur toutes les interfaces
-CMD ["streamlit", "run", "chatbot_app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+CMD ["streamlit", "run", "chatbot_app.py", "--server.address=0.0.0.0", "--server.port=7860"]

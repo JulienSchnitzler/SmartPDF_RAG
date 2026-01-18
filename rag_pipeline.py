@@ -1,12 +1,12 @@
-import os
-import json
 import hashlib
+import json
+import os
 import re
+
 import streamlit as st
 from dotenv import load_dotenv
-
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from rank_bm25 import BM25Okapi
 
@@ -79,7 +79,7 @@ def _store_exists() -> bool:
     return os.path.exists(STORE_PATH)
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def initialize_rag_pipeline(force_reindex: bool = False):
     load_dotenv()
 
@@ -130,9 +130,7 @@ def initialize_rag_pipeline(force_reindex: bool = False):
                     st.error("Aucun contenu extrait des PDF (PDF vides/protégés ?).")
                     return None, None
 
-                splitter = RecursiveCharacterTextSplitter(
-                    chunk_size=1000, chunk_overlap=200
-                )
+                splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
                 chunks = splitter.split_documents(documents)
 
                 texts = [c.page_content for c in chunks]
@@ -141,7 +139,7 @@ def initialize_rag_pipeline(force_reindex: bool = False):
                 tokenized_corpus = [_tokenize(t) for t in texts]
                 bm25 = BM25Okapi(tokenized_corpus)
 
-                # On sauvegarde les chunks + metas, et on reconstruit bm25 au chargement (rapide)
+                # Sauvegarde chunks + metas et reconstruction de bm25 au chargement
                 _write_json(STORE_PATH, {"texts": texts, "metas": metas})
                 _write_json(
                     MANIFEST_PATH,
@@ -155,7 +153,7 @@ def initialize_rag_pipeline(force_reindex: bool = False):
                 st.info("📄 Ajoute des PDF pour commencer.")
                 return None, None
 
-        # Charger store + reconstruire BM25 (léger et rapide)
+        # Charger store + reconstruire BM25
         store = _read_json(STORE_PATH)
         texts = store.get("texts", [])
         metas = store.get("metas", [])
@@ -171,14 +169,10 @@ def initialize_rag_pipeline(force_reindex: bool = False):
             q_tok = _tokenize(query)
             scores = bm25.get_scores(q_tok)
             # top-k indices
-            top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[
-                :k
-            ]
+            top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:k]
             results = []
             for i in top_idx:
-                results.append(
-                    {"text": texts[i], "meta": metas[i], "score": float(scores[i])}
-                )
+                results.append({"text": texts[i], "meta": metas[i], "score": float(scores[i])})
             return results
 
         return llm, retriever_fn

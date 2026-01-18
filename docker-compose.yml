@@ -7,6 +7,18 @@ services:
     env_file:
       - .env
     volumes:
-      - ./PDF:/app/PDF
-      - ./faiss_index:/app/faiss_index
+      - .:/app
+      # On "protège" ces dossiers pour que Docker utilise les siens 
+      # et pas ceux de ton Windows (Winnie)
+      - /app/.venv
+      - /app/PDF
+      - /app/bm25_index
+    command: streamlit run chatbot_app.py --server.address=0.0.0.0 --server.port=8501 --server.fileWatcherType poll
     restart: unless-stopped
+
+  lint:
+    build: .
+    volumes:
+      - .:/app
+      - /app/.venv
+    command: sh -c "ruff check . --fix && black ."
