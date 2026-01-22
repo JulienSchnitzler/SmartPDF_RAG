@@ -30,7 +30,7 @@ Ce projet est une application de RAG (Retrieval-Augmented Generation) permettant
 7. [Utilisation](#-utilisation)
 8. [Structure du projet](#-structure-du-projet)
 9. [Fonctionnement de l'indexation](#-fonctionnement-de-lindexation)
-10.     [Perspectives d'évolution](#-perspectives-dévolution)
+10. [Perspectives d'évolution](#-perspectives-dévolution)
 
 ## 🚀 Concept
 L'application permet d'uploader des documents PDF et de discuter avec eux via une interface de chat. Contrairement à un chatbot classique, celui-ci "lit" vos documents en temps réel pour extraire les passages pertinents avant de générer une réponse, évitant ainsi les hallucinations et garantissant la véracité des informations.
