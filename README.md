@@ -16,6 +16,10 @@ pinned: false
 
 Ce projet est une application de RAG (Retrieval-Augmented Generation) permettant d'interroger des documents PDF de manière naturelle. Il utilise la puissance de Google Gemini 3 combinée à un moteur de recherche BM25 pour garantir des réponses précises et sourcées.
 
+### Documentation
+- [Guide utilisateur](./docs/guide_utilisateur-SmartPDF_RAG.pdf)
+- [Architecture](./docs/ARCHITECTURE.md)
+
 ## 📌 Sommaire
 1. [Concept](#-concept)
 2. [Points forts](#-points-forts)
@@ -26,7 +30,7 @@ Ce projet est une application de RAG (Retrieval-Augmented Generation) permettant
 7. [Utilisation](#-utilisation)
 8. [Structure du projet](#-structure-du-projet)
 9. [Fonctionnement de l'indexation](#-fonctionnement-de-lindexation)
-10. [Perspectives d'évolution](#-perspectives-dévolution)
+10.     [Perspectives d'évolution](#-perspectives-dévolution)
 
 ## 🚀 Concept
 L'application permet d'uploader des documents PDF et de discuter avec eux via une interface de chat. Contrairement à un chatbot classique, celui-ci "lit" vos documents en temps réel pour extraire les passages pertinents avant de générer une réponse, évitant ainsi les hallucinations et garantissant la véracité des informations.
